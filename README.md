@@ -1,1 +1,0 @@
-Amor, si lees esto quiero decirte que soy medio sonsa así que me demoro el doble en hacer cosas tecnológicas, aún así, decidí hacer esto para ti porque vales esto y mucho más :3 Te amo mucho mi vida, felices 8 meses/día de la novia
