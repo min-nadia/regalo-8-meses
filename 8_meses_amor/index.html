@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8 Meses de Amor</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f0ff;
+            text-align: center;
+        }
+        
+        #juego-memoria {
+            padding: 20px;
+        }
+        
+        #tablero {
+            display: grid;
+            grid-template-columns: repeat(8, 80px);
+            gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+        
+        .carta {
+            width: 80px;
+            height: 80px;
+            background-color: #ff69b4;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .carta.volteada {
+            background-color: white;
+            transform: rotateY(180deg);
+        }
+        
+        .carta img {
+            max-width: 90%;
+            max-height: 90%;
+            display: none;
+            border-radius: 5px;
+        }
+        
+        .carta.volteada img {
+            display: block;
+        }
+        
+        #botellas-section {
+            display: none;
+            background: linear-gradient(to bottom, #87CEEB, #1E90FF);
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .botella {
+            position: absolute;
+            width: 60px;
+            animation: flotar 5s infinite ease-in-out;
+            cursor: pointer;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));
+        }
+        
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        .mensaje {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            max-width: 80%;
+            z-index: 100;
+        }
+        
+        h1 {
+            color: #ff69b4;
+        }
+
+        /* Estilos del reproductor de música */
+        #reproductor {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 50px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        #boton-musica {
+            padding: 10px;
+            background: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="juego-memoria">
+        <h1>💖 Nuestros 16 Recuerdos 💖</h1>
+        <p>Encuentra todas las parejas para descubrir mensajes secretos...</p>
+        <div id="tablero"></div>
+    </div>
+
+    <div id="botellas-section">
+        <h1 style="color:white">¡Felices 8 meses!</h1>
+        
+        <!-- Botellas con rutas corregidas -->
+        <img src="img_juego2/BOTELLA.png" class="botella" style="left:15%;top:20%" onclick="mostrarMensaje(1)" />
+        <img src="img_juego2/BOTELLA.png" class="botella" style="left:35%;top:60%" onclick="mostrarMensaje(2)" />
+        <img src="img_juego2/BOTELLA.png" class="botella" style="left:55%;top:30%" onclick="mostrarMensaje(3)" />
+        <img src="img_juego2/BOTELLA.png" class="botella" style="left:75%;top:50%" onclick="mostrarMensaje(4)" />
+        <img src="img_juego2/BOTELLA.png" class="botella" style="left:90%;top:20%" onclick="mostrarMensaje(5)" />
+        
+        <!-- Mensajes personalizados -->
+        <div id="mensaje1" class="mensaje">
+            <h3>Cuando te conocí por primera vez...</h3>
+            <p>Supe al instante que serías alguien muy especial para mí</p>
+        </div>
+        <div id="mensaje2" class="mensaje">
+            <h3>En nuestra primera cita</h3>
+            <p>Nos pasamos de intensas al irnos a Londres para la cita</p>
+        </div>
+        <div id="mensaje3" class="mensaje">
+            <h3>Hemos pasado por mucho juntas</h3>
+            <p>Gracias por ser paciente y acompañarme en todas mis aventuras</p>
+        </div>
+        <div id="mensaje4" class="mensaje">
+            <h3>Cada vez que nos miramos a los ojos</h3>
+            <p>Nos decimos lo mucho que nos amamos, al borde del llanto</p>
+        </div>
+        <div id="mensaje5" class="mensaje">
+            <h3>Te digo un secreto?</h3>
+            <p>Te amo más que a los choco twists del Tesco y los postres de lúcuma</p>
+        </div>
+    </div>
+
+    <!-- Reproductor de música -->
+    <div id="reproductor">
+        <audio id="musica" loop>
+            <source src="musica.mp3" type="audio/mp3">
+            Tu navegador no soporta audio.
+        </audio>
+        <button id="boton-musica" onclick="controlarMusica()">🎵</button>
+        <input type="range" min="0" max="1" step="0.1" value="0.5" oninput="document.getElementById('musica').volume = this.value" style="width: 80px;">
+    </div>
+
+    <script>
+        // ===== MÚSICA =====
+        function controlarMusica() {
+            const musica = document.getElementById('musica');
+            const boton = document.getElementById('boton-musica');
+            
+            if (musica.paused) {
+                musica.play().catch(e => console.log("Click el botón para activar el audio"));
+                boton.innerHTML = "🔊";
+                boton.style.background = "#4CAF50";
+            } else {
+                musica.pause();
+                boton.innerHTML = "🎵";
+                boton.style.background = "#ff69b4";
+            }
+        }
+
+        // Configura volumen inicial
+        document.getElementById('musica').volume = 0.5;
+
+        // ===== JUEGO DE MEMORIA =====
+        function cargarImagen(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(url);
+                img.onerror = () => reject(`Error al cargar: ${url}`);
+                img.src = url;
+            });
+        }
+
+        async function precargarImagenes() {
+            const imagenes = [];
+            for (let i = 1; i <= 16; i++) {
+                imagenes.push(cargarImagen(`img_juego2/foto${i}.jpeg`)); // .jpeg
+            }
+            imagenes.push(cargarImagen('img_juego2/BOTELLA.png'));
+            
+            try {
+                await Promise.all(imagenes);
+                iniciarJuego();
+            } catch (error) {
+                alert(`ERROR: Verifica que:\n1. Las imágenes estén en la carpeta "img_juego2"\n2. Se llamen: foto1.jpeg, foto2.jpeg..., BOTELLA.png\n3. No tengan espacios en los nombres`);
+                console.error(error);
+            }
+        }
+
+        function iniciarJuego() {
+            const cartas = [];
+            for (let i = 1; i <= 16; i++) {
+                cartas.push(i, i);
+            }
+            
+            cartas.sort(() => Math.random() - 0.5);
+
+            const tablero = document.getElementById('tablero');
+            cartas.forEach((id, index) => {
+                const carta = document.createElement('div');
+                carta.className = 'carta';
+                carta.dataset.id = id;
+                carta.innerHTML = `?<img src="img_juego2/foto${id}.jpeg" />`; // .jpeg
+                carta.addEventListener('click', () => voltearCarta(carta));
+                tablero.appendChild(carta);
+            });
+
+            let cartasVolteadas = [];
+            let parejas = 0;
+
+            function voltearCarta(carta) {
+                if (cartasVolteadas.length < 2 && !carta.classList.contains('volteada')) {
+                    carta.classList.add('volteada');
+                    cartasVolteadas.push(carta);
+
+                    if (cartasVolteadas.length === 2) {
+                        setTimeout(verificarPareja, 500);
+                    }
+                }
+            }
+
+            function verificarPareja() {
+                const [carta1, carta2] = cartasVolteadas;
+                if (carta1.dataset.id === carta2.dataset.id) {
+                    parejas++;
+                    if (parejas === 16) {
+                        document.getElementById('juego-memoria').style.display = 'none';
+                        document.getElementById('botellas-section').style.display = 'block';
+                    }
+                } else {
+                    carta1.classList.remove('volteada');
+                    carta2.classList.remove('volteada');
+                }
+                cartasVolteadas = [];
+            }
+        }
+
+        // ===== BOTELLAS =====
+        function mostrarMensaje(num) {
+            const mensaje = document.getElementById(`mensaje${num}`);
+            mensaje.style.display = 'block';
+            setTimeout(() => {
+                mensaje.style.display = 'none';
+            }, 3000);
+        }
+
+        // Inicia todo al cargar la página
+        window.onload = precargarImagenes;
+    </script>
+</body>
+</html>
